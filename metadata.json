@@ -1,0 +1,14 @@
+{
+    "description": "Script to recycle secrets across repositories",
+    "homepage": "https://github.com/kbrashears5/secret-recycler",
+    "keywords": [
+        "secret",
+        "token",
+        "actions",
+        "recycle",
+        "recycler",
+        "repo",
+        "repos",
+        "repositories"
+    ]
+}
