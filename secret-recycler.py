@@ -21,6 +21,28 @@ def encrypt(publicKey: str, secretValue: str) -> str:
 
     return b64encode(encrypted).decode("utf-8")
 
+# create the secrets function
+def createSecrets(repos: object):
+    # loop through all repositories
+    for repo in repos:
+        repoName = repo['full_name']
+        print(repoName)
+
+        publicKey_response = requests.get('https://api.github.com/repos/' + repoName + '/actions/secrets/public-key', headers=headers, auth=(USERNAME, TOKEN))
+        key = publicKey_response.json()
+        print(key)
+
+        # create body
+        encryptedValue = encrypt(key['key'], SECRET_VALUE)
+        data = '{"key_id":"' + key['key_id'] + '","encrypted_value":"' + encryptedValue + '"}'
+        print(data)
+        
+        # create or update the secret
+        response = requests.put('https://api.github.com/repos/' + repoName + '/actions/secrets/' + SECRET_NAME, headers=headers, data=data, auth=(USERNAME, TOKEN))
+        print(response)
+
+        print(" ")
+
 # create headers object
 headers = {
     'Accept': 'application/vnd.github.v3+json',
@@ -28,25 +50,16 @@ headers = {
 }
 
 # get all repositories
-repos_response = requests.get('https://api.github.com/users/' + USERNAME + '/repos', headers=headers, auth=(USERNAME, TOKEN))
-repos = repos_response.json()
+url = 'https://api.github.com/users/' + USERNAME + '/repos'
+while url != "":
+    print(url)
+    repos_response = requests.get(url, headers=headers, auth=(USERNAME, TOKEN))
 
-# loop through all repositories
-for repo in repos:
-    repoName = repo['full_name']
-    print(repoName)
+    repos = repos_response.json()
 
-    publicKey_response = requests.get('https://api.github.com/repos/' + repoName + '/actions/secrets/public-key', headers=headers, auth=(USERNAME, TOKEN))
-    key = publicKey_response.json()
-    print(key)
+    createSecrets(repos)
 
-    # create body
-    encryptedValue = encrypt(key['key'], SECRET_VALUE)
-    data = '{"key_id":"' + key['key_id'] + '","encrypted_value":"' + encryptedValue + '"}'
-    print(data)
-    
-    # create or update the secret
-    response = requests.put('https://api.github.com/repos/' + repoName + '/actions/secrets/' + SECRET_NAME, headers=headers, data=data, auth=(USERNAME, TOKEN))
-    print(response.json())
-
-    print(" ")
+    if 'next' in repos_response.links:
+        url = (repos_response.links['next']['url'])
+    else:
+        url = ""
