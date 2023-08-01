@@ -1,11 +1,6 @@
-<h1 align="center">github-secret-recycler</h1>
+# github-secret-recycler
 
-
-<div align="center">
-
-<b>Script to recycle secrets across repositories</b>
-
-</div>
+Script to recycle secrets across repositories
 
 # Usage
 1. Fill in the parameters under the #parameters section in the `secret-recycler.py`
